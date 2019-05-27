@@ -1,0 +1,147 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    outline: 0;
+}
+
+@font-face{
+    font-family: Minecrafter;
+    src: url("Images/Minecrafter.Reg.ttf");
+}
+
+/*/ Classes /*/
+.container{
+    background-color: #854F2B;
+    margin: auto;
+    height: 950px;
+    width: 50%;
+}
+.top{
+    background-color: #477A1E;
+    height: 15%;
+    width: 100%;
+    text-align: center
+}
+.middle{
+    height: 65%;
+    text-align: center;
+}
+.bottom{
+    background-color: #8FCA5C;
+    height: 20%;
+    width: 100%;
+    position: relative;
+    bottom: 0px;
+}
+.menuButton{
+    width: 24.6%;
+    height: 100%;
+    background-color: #8FCA5C;
+    background-repeat: no-repeat;
+    border: black solid 3px; 
+}
+.upgrade{
+    position: relative;
+    width: 90%;
+    height: 200px;
+    background-color: #61371F;
+    border: black solid 3px;
+    border-radius: 5px;
+    margin: auto;
+    margin-top: 5px;
+    font-family: Minecrafter;
+}
+.upgradeButton{
+    height: 90%;
+    width: 30%;
+    border: black solid 2px;
+    border-radius: 5px;
+    position: absolute;
+    top: 5%;
+    left: 69%;
+    font-family: Minecrafter;
+    font-size: 40px;
+    color: lightgray;
+}
+.upgradeName{
+    height: 30%;
+    width: 40%;
+    font-size: 35px;
+    color: lightgray;
+    border: black solid 2px;
+    border-radius: 5px;
+    position: absolute;
+    top: 5%;
+    left: 1%;
+    line-height: 150%;
+}
+.upgradeLevel{
+    height: 30%;
+    width: 25%;
+    font-size: 35px;
+    color: lightgray;
+    border: black solid 2px;
+    border-radius: 5px;
+    position: absolute;
+    top: 5%;
+    left: 42%;
+    line-height: 150%;
+}
+.upgradeDescription{
+    height: 50%;
+    width: 65%;
+    font-size: 20px;
+    color: lightgray;
+    border: black solid 2px;
+    border-radius: 5px;
+    position: absolute;
+    top: 40%;
+    left: 1%;
+}
+.available{
+    background-color: green;
+}
+.unavailable{
+    background-color: red;
+}
+.vertical{ margin-top: 2%;}
+/*/ ID's /*/
+#block{
+    width:300px;
+    height:300px;
+    background-color: #854F2B;
+    background-image: url("Images/Stone.png");
+    border: none;
+    margin: auto;
+    margin-top: 10%;
+    cursor: url("Images/Diamond_Pickaxe.png"), auto;
+}
+#moneyCounter{
+    font-size: 80px;
+    position: relative;
+    top: 50px;
+}
+#cooldownBar{
+    width: 80%;
+    margin: auto;
+    margin-top: 1%;
+    border: black solid 1px;
+    border-radius: 5px;
+    height: 10%;  
+}
+#progressBar{
+    height: 100%;
+    width: 0%;
+    background-color: #C28340;
+    border: none;
+    border-radius: 5px;
+}
+#cooldownTimer{
+    font-size: 20px;
+    position: relative;
+    bottom: 100%;
+}
+#upgradesPage{
+    overflow-y: scroll;
+    height: 100%;
+}

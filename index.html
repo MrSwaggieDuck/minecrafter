@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>MC Prison Clicker</title>
+        <link rel="stylesheet" type="text/css" href="prisonclicker.css">
+    </header>
+    <body>
+        <div class="container">
+            <div class="top">
+               <p id="moneyCounter">€0</p>  
+            </div>
+            <div class="middle">
+                <div id="cooldownBar"><div id="progressBar"></div><p id="cooldownTimer">0</p></div>
+                
+                <button id="block" onclick="mine()"></button>
+            </div>
+            <div class="bottom">
+                <button style="background-image: url('Images/Experience_Orb.gif'); background-position: 50% 50%;" class="menuButton"></button>
+                <button style="background-image: url('Images/Enchantment_Table.png'); background-position: 50% 50%;" onclick="location.href='upgrades.html'" class="menuButton"></button>
+                <button style="background-image: url('Images/Redstone.png'); background-position: 50% 50%;" class="menuButton"></button>
+                <button style="background-image: url('Images/Beacon.png'); background-position: 50% 50%;" class="menuButton"></button>
+            </div>
+        </div>
+    </body>
+<script src="prisonclicker.js"></script>
+</html>
