@@ -1,19 +1,21 @@
-*{
-    padding: 0px;
-    margin: 0px;
-    outline: 0;
-}
-
 @font-face{
     font-family: Minecrafter;
     src: url("Images/Minecrafter.Reg.ttf");
 }
-
+*{
+    padding: 0px;
+    margin: 0px;
+    outline: 0;
+    font-family: Minecrafter;
+    color: lightgray;
+}
+html { height: 100%; }
+body { height: 100%; }
 /*/ Classes /*/
 .container{
     background-color: #854F2B;
     margin: auto;
-    height: 950px;
+    height: 100%;
     width: 50%;
 }
 .top{
@@ -32,13 +34,14 @@
     width: 100%;
     position: relative;
     bottom: 0px;
+    font-size: 0px;
 }
 .menuButton{
-    width: 24.6%;
+    width: 25%;
     height: 100%;
     background-color: #8FCA5C;
     background-repeat: no-repeat;
-    border: black solid 3px; 
+    border: black solid 3px;
 }
 .upgrade{
     position: relative;
@@ -65,27 +68,27 @@
 }
 .upgradeName{
     height: 30%;
-    width: 40%;
-    font-size: 35px;
+    width: 35%;
+    font-size: 30px;
     color: lightgray;
     border: black solid 2px;
     border-radius: 5px;
     position: absolute;
     top: 5%;
     left: 1%;
-    line-height: 150%;
+    line-height: 180%;
 }
 .upgradeLevel{
     height: 30%;
-    width: 25%;
-    font-size: 35px;
+    width: 29%;
+    font-size: 30px;
     color: lightgray;
     border: black solid 2px;
     border-radius: 5px;
     position: absolute;
     top: 5%;
-    left: 42%;
-    line-height: 150%;
+    left: 37%;
+    line-height: 180%;
 }
 .upgradeDescription{
     height: 50%;
@@ -144,4 +147,65 @@
 #upgradesPage{
     overflow-y: scroll;
     height: 100%;
+}
+#autominer{
+    border: black solid 2px;
+    border-radius: 5px;
+    width: 95%;
+    height: 40%;
+    margin: auto;
+    margin-top: 1%;
+    background-color: #61371F;
+}
+#autominerButton{
+    width: 40%;
+    border: black solid 2px;
+    border-radius: 5px;
+    height: 50%;
+    margin: auto;
+    margin-top: 3%;
+}
+#autominerDescription{
+    font-size: 40px;
+    margin-top: 1%;
+}
+#autominerChance{
+    font-size: 80px;
+    margin-top: 4%;
+}
+#autominerCost{
+    margin-top: 25%;
+    font-size: 40px;
+}
+#rank{
+    width: 50%;
+    height: 30%;
+    background-color: #61371F;
+    border: black solid 2px;
+    border-radius: 5px;
+    margin: auto;
+    margin-top: 0.5%;
+    font-size: 200px;
+}
+#currentMultiplier{
+    width: 40%;
+    margin: auto;
+    margin-top: 1%;
+    height: 15%;
+    font-size: 30px;
+    display: inline-block;
+    background-color: #61371F;
+    border: black solid 2px;
+    border-radius: 5px;
+    line-height: 150%;
+}
+#rankButton{
+    width: 60%;
+    height: 40%;
+    margin: auto;
+    margin-top: 1%;
+    border: black solid 2px;
+    border-radius: 5px;
+    font-size: 40px;
+    line-height: 250%;
 }
