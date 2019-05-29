@@ -101,6 +101,16 @@ body { height: 100%; }
     top: 40%;
     left: 1%;
 }
+.buyAmountButton{
+    width: 20%;
+    margin: auto;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    border: black solid 2px;
+    height: 90%;
+    margin-top: 0.5%;
+    font-size: 20px;
+}
 .available{
     background-color: green;
 }
@@ -147,6 +157,15 @@ body { height: 100%; }
 #upgradesPage{
     overflow-y: scroll;
     height: 100%;
+}
+#buyAmount{
+    border: black solid 3px;
+    border-radius: 5px;
+    background-color: #61371F;
+    width: 90%;
+    height: 10%;
+    margin: auto;
+    font-size: 0px;
 }
 #autominer{
     border: black solid 2px;
@@ -201,11 +220,11 @@ body { height: 100%; }
 }
 #rankButton{
     width: 60%;
-    height: 40%;
+    height: 25%;
     margin: auto;
     margin-top: 1%;
     border: black solid 2px;
     border-radius: 5px;
     font-size: 40px;
-    line-height: 250%;
+    padding-top: 10%;
 }

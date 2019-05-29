@@ -3,6 +3,7 @@ var money = 0;
 var currentBlock = 0;
 var cooldown = 0;
 var maxCooldown = 10;
+var buyAmount = 1;
 var rank = {
     cost: 100, 
     level: 1,
@@ -12,10 +13,16 @@ var rank = {
 var efficiency = {
     cost: 10,
     level: 0,
+    max: 0,
+    increase: 1.5,
+    effect: 0.9,
 };
 var fortune = {
     cost: 20,
     level: 0,
+    max: 0,
+    increase: 1.015,
+    effect: 1.01,
 }
 var autominer = {
     level: 0,
@@ -26,20 +33,12 @@ function load() {
     if(localStorage.getItem("money") != null){
         money = Number(localStorage.getItem("money"));
         cooldown = Number(localStorage.getItem("cooldown"));
-        efficiency = {
-            cost: Number(localStorage.getItem("efficiencyCost")),
-            level: Number(localStorage.getItem("efficiencyLevel")),
-        };
-        fortune = {
-            cost: Number(localStorage.getItem("fortuneCost")),
-            level: Number(localStorage.getItem("fortuneLevel")),
-        }
-        autominer = {
-            cost: Number(localStorage.getItem("autominerCost")),
-            level: Number(localStorage.getItem("autominerLevel")),
-        }
+        efficiency.level = Number(localStorage.getItem("efficiencyLevel"));
+        fortune.level = Number(localStorage.getItem("fortuneLevel"));
+        autominer.level = Number(localStorage.getItem("autominerLevel"));
         rank.level = Number(localStorage.getItem("rank"));
         currentBlock = Number(localStorage.getItem("currentBlock"));
+        buyAmount = Number(localStorage.getItem("buyAmount"));
     }
     if (document.URL.includes("index")) {
         switch(currentBlock) {
@@ -60,28 +59,28 @@ if (cooldown > maxCooldown) {
     cooldown = 0;
     switch(currentBlock) {
         case 0: 
-            money += Math.pow(1.1, fortune.level) * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * rank.multiplier;
             break
         case 1:
-            money += Math.pow(1.1, fortune.level) * 2 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 2 * rank.multiplier;
             break
         case 2:
-            money += Math.pow(1.1, fortune.level) * 4 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 4 * rank.multiplier;
             break
         case 3:
-            money += Math.pow(1.1, fortune.level) * 8 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 8 * rank.multiplier;
             break
         case 4:
-            money += Math.pow(1.1, fortune.level) * 16 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 16 * rank.multiplier;
             break
         case 5:
-            money += Math.pow(1.1, fortune.level) * 32 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 32 * rank.multiplier;
             break
         case 6:
-            money += Math.pow(1.1, fortune.level) * 64 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 64 * rank.multiplier;
             break
         case 7:
-            money += Math.pow(1.1, fortune.level) * 128 * rank.multiplier;
+            money += Math.pow(fortune.effect, fortune.level) * 128 * rank.multiplier;
             break
     }
     chance = Math.random() * 100;
@@ -133,30 +132,70 @@ function update() {
     }
     // UPGRADES PAGE //
     if (document.URL.includes("upgrades")) {
-        //EFFICIENCY
-        if (money >= efficiency.cost) {
-            document.querySelector("#efficiencyButton").classList.add("available");
-            document.querySelector("#efficiencyButton").classList.remove("unavailable");
-        } else {
-            document.querySelector("#efficiencyButton").classList.add("unavailable");
-            document.querySelector("#efficiencyButton").classList.remove("available");
+        if (buyAmount == 1) {
+            efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
+            fortune.cost = 20*Math.pow(fortune.increase, fortune.level)
+        } else if (buyAmount == 10 || buyAmount == 100) {
+            efficiency.cost = 0;
+            fortune.cost = 0;
+            for (i = 0; i < buyAmount; i++) {
+                efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
+                fortune.cost += 20*Math.pow(fortune.increase, fortune.level + i);
+            }
+        } else if (buyAmount == 0) {
+            efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
+            fortune.cost = 20*Math.pow(fortune.increase, fortune.level);
+            i = 0;
+            while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
+                i += 1;
+                efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
+            }
+            efficiency.max = i;
+            i = 0;
+            while(money > fortune.cost + 20*Math.pow(fortune.increase, fortune.level + i)) {
+                i += 1;
+                fortune.cost += 20*Math.pow(fortune.increase, fortune.level + i)
+            }
+            fortune.max = i;
+            i = 0;
         }
+
+        if (money >= efficiency.cost) { document.querySelector("#efficiencyButton").classList.replace("unavailable", "available");
+        } else { document.querySelector("#efficiencyButton").classList.replace("available", "unavailable"); }
+        if (money >= fortune.cost) { document.querySelector("#fortuneButton").classList.replace("unavailable", "available");
+        } else { document.querySelector("#fortuneButton").classList.replace("available", "unavailable"); }
+        
+        if (buyAmount == 1) {
+            document.querySelector("#buy1").classList.replace("unavailable", "available");
+            document.querySelector("#buy10").classList.replace("available", "unavailable");
+            document.querySelector("#buy100").classList.replace("available", "unavailable");
+            document.querySelector("#buyMax").classList.replace("available", "unavailable");
+        } else if (buyAmount == 10) {
+            document.querySelector("#buy1").classList.replace("available", "unavailable");
+            document.querySelector("#buy10").classList.replace("unavailable", "available");
+            document.querySelector("#buy100").classList.replace("available", "available");
+            document.querySelector("#buyMax").classList.replace("available", "unavailable");
+        } else if (buyAmount == 100) {
+            document.querySelector("#buy1").classList.replace("available", "unavailable");
+            document.querySelector("#buy10").classList.replace("available", "unavailable");
+            document.querySelector("#buy100").classList.replace("unavailable", "available");
+            document.querySelector("#buyMax").classList.replace("available", "unavailable");
+        } else if (buyAmount == 0) {
+            document.querySelector("#buy1").classList.replace("available", "unavailable");
+            document.querySelector("#buy10").classList.replace("available", "unavailable");
+            document.querySelector("#buy100").classList.replace("available", "unavailable");
+            document.querySelector("#buyMax").classList.replace("unavailable", "available");
+        }
+
         document.querySelector("#efficiencyButton").innerHTML = "€" + convert(efficiency.cost);
         document.querySelector("#efficiencyLevel").innerHTML = "Lvl " + convert(efficiency.level);
-        //FORTUNE
-        if (money >= fortune.cost) {
-            document.querySelector("#fortuneButton").classList.add("available");
-            document.querySelector("#fortuneButton").classList.remove("unavailable");
-        } else {
-            document.querySelector("#fortuneButton").classList.add("unavailable");
-            document.querySelector("#fortuneButton").classList.remove("available");
-        }
         document.querySelector("#fortuneButton").innerHTML = "€" + convert(fortune.cost);
         document.querySelector("#fortuneLevel").innerHTML = "Lvl " + convert(fortune.level);
-        document.querySelector("#fortuneDescription").innerHTML = "Fortune will increase the amount of money you get by 10% per level! ("+convert(Math.pow(1.1, fortune.level))+"x)";
+        document.querySelector("#fortuneDescription").innerHTML = "Fortune will increase the amount of money you get by 1% per level! ("+convert(Math.pow(fortune.effect, fortune.level))+"x)";
     }
     // AUTOMINER PAGE //
     if (document.URL.includes("autominer")) {
+        autominer.cost = Math.pow(10, 2+autominer.level);
         if (money >= autominer.cost) {
             document.querySelector("#autominerButton").classList.add("available");
             document.querySelector("#autominerButton").classList.remove("unavailable");
@@ -182,32 +221,32 @@ function update() {
     
     
     switch (rank.level) {
-        case 1: rank = { level: 1, letter: "A", cost: 1e2, multiplier: 1, }; break;
-        case 2: rank = { level: 2, letter: "B", cost: 5e2, multiplier: 2, }; break;
-        case 3: rank = { level: 3, letter: "C", cost: 1e3, multiplier: 5, }; break;
-        case 4: rank = { level: 4, letter: "D", cost: 5e3, multiplier: 10, }; break;
-        case 5: rank = { level: 5, letter: "E", cost: 1e4, multiplier: 20, }; break;
-        case 6: rank = { level: 6, letter: "F", cost: 5e4, multiplier: 50, }; break;
-        case 7: rank = { level: 7, letter: "G", cost: 1e5, multiplier: 1e2, }; break;
-        case 8: rank = { level: 8, letter: "H", cost: 5e5, multiplier: 2e2, }; break;
-        case 9: rank = { level: 9, letter: "I", cost: 1e6, multiplier: 5e2, }; break;
-        case 10: rank = { level: 10, letter: "J", cost: 5e6, multiplier: 1e3, }; break;
-        case 11: rank = { level: 11, letter: "K", cost: 1e7, multiplier: 2e3, }; break;
-        case 12: rank = { level: 12, letter: "L", cost: 5e7, multiplier: 5e3, }; break;
-        case 13: rank = { level: 13, letter: "M", cost: 1e8, multiplier: 1e4, }; break;
-        case 14: rank = { level: 14, letter: "N", cost: 5e8, multiplier: 2e4, }; break;
-        case 15: rank = { level: 15, letter: "O", cost: 1e9, multiplier: 5e4, }; break;
-        case 16: rank = { level: 16, letter: "P", cost: 5e9, multiplier: 1e5, }; break;
-        case 17: rank = { level: 17, letter: "Q", cost: 1e10, multiplier: 2e5, }; break;
-        case 18: rank = { level: 18, letter: "R", cost: 5e10, multiplier: 5e5, }; break;
-        case 19: rank = { level: 19, letter: "S", cost: 1e11, multiplier: 1e6, }; break;
-        case 20: rank = { level: 20, letter: "T", cost: 5e11, multiplier: 2e6, }; break;
-        case 21: rank = { level: 21, letter: "U", cost: 1e12, multiplier: 5e6, }; break;
-        case 22: rank = { level: 22, letter: "V", cost: 5e12, multiplier: 1e7, }; break;
-        case 23: rank = { level: 23, letter: "W", cost: 1e13, multiplier: 2e7, }; break;
-        case 24: rank = { level: 24, letter: "X", cost: 5e13, multiplier: 5e7, }; break;
-        case 25: rank = { level: 25, letter: "Y", cost: 1e14, multiplier: 1e8, }; break;
-        case 26: rank = { level: 26, letter: "Z", cost: 5e14, multiplier: 2e8, }; break;
+        case 1: rank = { level: 1, letter: "A", cost: 100, multiplier: 1, }; break;
+        case 2: rank = { level: 2, letter: "B", cost: 100*Math.pow(5, 1), multiplier: 2, }; break;
+        case 3: rank = { level: 3, letter: "C", cost: 100*Math.pow(5, 2), multiplier: 5, }; break;
+        case 4: rank = { level: 4, letter: "D", cost: 100*Math.pow(5, 3), multiplier: 10, }; break;
+        case 5: rank = { level: 5, letter: "E", cost: 100*Math.pow(5, 4), multiplier: 20, }; break;
+        case 6: rank = { level: 6, letter: "F", cost: 100*Math.pow(5, 5), multiplier: 50, }; break;
+        case 7: rank = { level: 7, letter: "G", cost: 100*Math.pow(5, 6), multiplier: 1e2, }; break;
+        case 8: rank = { level: 8, letter: "H", cost: 100*Math.pow(5, 7), multiplier: 2e2, }; break;
+        case 9: rank = { level: 9, letter: "I", cost: 100*Math.pow(5, 8), multiplier: 5e2, }; break;
+        case 10: rank = { level: 10, letter: "J", cost: 100*Math.pow(5, 9), multiplier: 1e3, }; break;
+        case 11: rank = { level: 11, letter: "K", cost: 100*Math.pow(5, 10), multiplier: 2e3, }; break;
+        case 12: rank = { level: 12, letter: "L", cost: 100*Math.pow(5, 11), multiplier: 5e3, }; break;
+        case 13: rank = { level: 13, letter: "M", cost: 100*Math.pow(5, 12), multiplier: 1e4, }; break;
+        case 14: rank = { level: 14, letter: "N", cost: 100*Math.pow(5, 13), multiplier: 2e4, }; break;
+        case 15: rank = { level: 15, letter: "O", cost: 100*Math.pow(5, 14), multiplier: 5e4, }; break;
+        case 16: rank = { level: 16, letter: "P", cost: 100*Math.pow(5, 15), multiplier: 1e5, }; break;
+        case 17: rank = { level: 17, letter: "Q", cost: 100*Math.pow(5, 16), multiplier: 2e5, }; break;
+        case 18: rank = { level: 18, letter: "R", cost: 100*Math.pow(5, 17), multiplier: 5e5, }; break;
+        case 19: rank = { level: 19, letter: "S", cost: 100*Math.pow(5, 18), multiplier: 1e6, }; break;
+        case 20: rank = { level: 20, letter: "T", cost: 100*Math.pow(5, 19), multiplier: 2e6, }; break;
+        case 21: rank = { level: 21, letter: "U", cost: 100*Math.pow(5, 20), multiplier: 5e6, }; break;
+        case 22: rank = { level: 22, letter: "V", cost: 100*Math.pow(5, 21), multiplier: 1e7, }; break;
+        case 23: rank = { level: 23, letter: "W", cost: 100*Math.pow(5, 22), multiplier: 2e7, }; break;
+        case 24: rank = { level: 24, letter: "X", cost: 100*Math.pow(5, 23), multiplier: 5e7, }; break;
+        case 25: rank = { level: 25, letter: "Y", cost: 100*Math.pow(5, 24), multiplier: 1e8, }; break;
+        case 26: rank = { level: 26, letter: "Z", cost: "MAX RANK!", multiplier: 2e8, }; break;
     } 
 
     localStorage.setItem("cooldown", cooldown);
@@ -228,27 +267,44 @@ function buyUpgrade(upgrade) {
     }
     if (upgrade == "efficiency" && money >= efficiency.cost) {
         money -= efficiency.cost;
-        efficiency.level += 1;
-        efficiency.cost = 10 * Math.pow(1.5, efficiency.level);
+        if (buyAmount != 0) {
+            efficiency.level += buyAmount;
+        } else {
+            efficiency.level += efficiency.max;
+        }
     }
     if (upgrade == "fortune" && money >= fortune.cost) {
         money -= fortune.cost;
-        fortune.level += 1;
-        fortune.cost = 20 * Math.pow(1.25, fortune.level);
+        if (buyAmount != 0) {
+            fortune.level += buyAmount;
+        } else {
+            fortune.level += fortune.max;
+        }
+    }
+
+}
+
+function setBuyAmount(amount) {
+    if (amount == 1 && buyAmount != 1) {
+        buyAmount = 1;
+    } else if (amount == 10 && buyAmount != 10) {
+        buyAmount = 10;
+    } else if (amount == 100 && buyAmount != 100) {
+        buyAmount = 100;
+    } else if (amount == 0 && buyAmount != 0) {
+        buyAmount = 0;
     }
 }
 
 function save() {
     localStorage.setItem("money", money);
     localStorage.setItem("cooldown", cooldown);
-    localStorage.setItem("efficiencyCost", efficiency.cost);
     localStorage.setItem("efficiencyLevel", efficiency.level);
-    localStorage.setItem("fortuneCost", fortune.cost);
     localStorage.setItem("fortuneLevel", fortune.level);
-    localStorage.setItem("autominerCost", autominer.cost);
     localStorage.setItem("autominerLevel", autominer.level);
     localStorage.setItem("rank", rank.level);
     localStorage.setItem("currentBlock", currentBlock);
+    localStorage.setItem("buyAmount", buyAmount);
 }
 
 function reset() {
