@@ -125,14 +125,13 @@ body { height: 100%; }
     background-color: #854F2B;
     background-image: url("Images/Stone.png");
     border: none;
-    margin: auto;
-    margin-top: 10%;
+    margin: 9% auto;
     cursor: url("Images/Diamond_Pickaxe.png"), auto;
 }
 #moneyCounter{
     font-size: 80px;
     position: relative;
-    top: 50px;
+    top: 40px;
 }
 #cooldownBar{
     width: 80%;
@@ -153,6 +152,28 @@ body { height: 100%; }
     font-size: 20px;
     position: relative;
     bottom: 100%;
+    padding-top: 3%;
+}
+#durabilityBar{
+    width: 80%;
+    margin: auto;
+    margin-top: 1%;
+    border: black solid 1px;
+    border-radius: 5px;
+    height: 10%;
+}
+#durabilityLeft{
+    height: 100%;
+    width: 0%;
+    background-color: blue;
+    border: none;
+    border-radius: 5px;
+}
+#durabilityCounter{
+    font-size: 20px;
+    position: relative;
+    bottom: 100%;
+    padding-top: 3%;
 }
 #upgradesPage{
     overflow-y: scroll;

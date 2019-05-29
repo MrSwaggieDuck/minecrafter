@@ -19,6 +19,12 @@
                     <button class="buyAmountButton unavailable" id="buyMax" onclick="setBuyAmount(0)">MAX</button>
                 </div>
                 <div class="upgrade">
+                    <button class="upgradeButton unavailable" id="unbreakingButton" onclick="buyUpgrade('unbreaking')">€10</button>
+                    <p class="upgradeName">Unbreaking</p>
+                    <p class="upgradeLevel" id="unbreakingLevel">Lvl 0</p>
+                    <div class="upgradeDescription"><p class="vertical">Unbreaking increases the durability of you pickaxe by 1!<p></div>
+                </div>
+                <div class="upgrade">
                     <button class="upgradeButton unavailable" id="efficiencyButton" onclick="buyUpgrade('efficiency')">€10</button>
                     <p class="upgradeName">Efficiency</p>
                     <p class="upgradeLevel" id="efficiencyLevel">Lvl 0</p>
@@ -30,7 +36,7 @@
                     <p class="upgradeLevel" id="fortuneLevel">Lvl 0</p>
                     <div class="upgradeDescription"><p id="fortuneDescription" class="vertical">Fortune will increase the amount of money you get by 10% per level! (1x)<p></div>
                 </div>
-                <div class="upgrade"></div>
+                
                 <div class="upgrade"></div>
             </div>
         </div>

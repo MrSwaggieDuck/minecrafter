@@ -2,8 +2,11 @@ var eBlock = document.querySelector("#block");
 var money = 0;
 var currentBlock = 0;
 var cooldown = 0;
-var maxCooldown = 10;
+var maxCooldown = 60;
+var durability = 5;
 var buyAmount = 1;
+var now;
+var lastMine = new Date();
 var rank = {
     cost: 100, 
     level: 1,
@@ -18,11 +21,18 @@ var efficiency = {
     effect: 0.9,
 };
 var fortune = {
-    cost: 20,
+    cost: 1,
     level: 0,
     max: 0,
     increase: 1.015,
     effect: 1.01,
+}
+var unbreaking = {
+    cost: 5,
+    level: 0,
+    max: 0,
+    increase: 1.5,
+    effect: 1,
 }
 var autominer = {
     level: 0,
@@ -35,10 +45,12 @@ function load() {
         cooldown = Number(localStorage.getItem("cooldown"));
         efficiency.level = Number(localStorage.getItem("efficiencyLevel"));
         fortune.level = Number(localStorage.getItem("fortuneLevel"));
+        unbreaking.level = Number(localStorage.getItem("unbreakingLevel"));
         autominer.level = Number(localStorage.getItem("autominerLevel"));
         rank.level = Number(localStorage.getItem("rank"));
         currentBlock = Number(localStorage.getItem("currentBlock"));
         buyAmount = Number(localStorage.getItem("buyAmount"));
+        durability = Number(localStorage.getItem("durability"));
     }
     if (document.URL.includes("index")) {
         switch(currentBlock) {
@@ -55,8 +67,9 @@ function load() {
 }
 
 function mine() {
-if (cooldown > maxCooldown) {
-    cooldown = 0;
+if (durability > 0) {
+    lastMine = new Date();
+    durability -= 1;
     switch(currentBlock) {
         case 0: 
             money += Math.pow(fortune.effect, fortune.level) * rank.multiplier;
@@ -91,7 +104,7 @@ if (cooldown > maxCooldown) {
     else if (chance < 9.25) { currentBlock = 3 }
     else if (chance < 19.25) { currentBlock = 2 }
     else if (chance < 49.25) { currentBlock = 1 }
-    else {  currentBlock = 0 }
+    else { currentBlock = 0 }
     if (document.URL.includes("index")) {
         switch(currentBlock) {
             case 0: eBlock.style.backgroundImage = "url(Images/Stone.png)"; break;
@@ -108,11 +121,12 @@ if (cooldown > maxCooldown) {
 }
 
 function automine() {
+    now = new Date()
     if (autominer.level > 0) {
-        if (Math.random()*100 < Math.pow(cooldown-maxCooldown, autominer.level/4)) { mine() }
+        if (Math.random()*100 < Math.pow((now - lastMine)/1000, autominer.level/3)) { mine() }
     }
-    if (Math.pow(cooldown-maxCooldown, autominer.level/4)-1 > 0 && document.URL.includes("autominer")) {
-        document.querySelector("#autominerChance").innerHTML = Math.round(Math.pow(cooldown-maxCooldown, autominer.level/4)*100)/100 + "%";
+    if (Math.pow((now - lastMine)/1000, autominer.level/3) > 0 && document.URL.includes("autominer")) {
+        document.querySelector("#autominerChance").innerHTML = Math.round(Math.pow((now - lastMine)/1000, autominer.level/3)*100)/100 + "%";
     } else if (document.URL.includes("autominer")) {
         document.querySelector("#autominerChance").innerHTML = 0 + "%";
     }
@@ -121,30 +135,30 @@ function automine() {
 function update() {
     // MAIN PAGE //
     if (document.URL.includes("index")) {
-        if (cooldown > maxCooldown) { 
-            document.querySelector("#progressBar").style.width = 100 + "%"; 
-            document.querySelector("#cooldownTimer").innerHTML = convert(maxCooldown);
-        }
-        else { 
-            document.querySelector("#progressBar").style.width =  cooldown/maxCooldown*100 + "%"; 
-            document.querySelector("#cooldownTimer").innerHTML = convert(cooldown);
-        }
+        document.querySelector("#progressBar").style.width = cooldown/maxCooldown*100 + "%"; 
+        document.querySelector("#cooldownTimer").innerHTML = Math.round(convert(cooldown/maxCooldown)*100) + "%";
+        document.querySelector("#durabilityLeft").style.width = durability/(unbreaking.level + 5)*100 + "%";
+        document.querySelector("#durabilityCounter").innerHTML = durability;
     }
     // UPGRADES PAGE //
     if (document.URL.includes("upgrades")) {
         if (buyAmount == 1) {
             efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
-            fortune.cost = 20*Math.pow(fortune.increase, fortune.level)
+            fortune.cost = 1*Math.pow(fortune.increase, fortune.level);
+            unbreaking.cost = 5*Math.pow(unbreaking.increase, unbreaking.level);
         } else if (buyAmount == 10 || buyAmount == 100) {
             efficiency.cost = 0;
             fortune.cost = 0;
+            unbreaking.cost = 0;
             for (i = 0; i < buyAmount; i++) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
-                fortune.cost += 20*Math.pow(fortune.increase, fortune.level + i);
+                fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i);
+                unbreaking.cost += 5*Math.pow(unbreaking.increase, unbreaking.level + i);
             }
         } else if (buyAmount == 0) {
             efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
-            fortune.cost = 20*Math.pow(fortune.increase, fortune.level);
+            fortune.cost = 1*Math.pow(fortune.increase, fortune.level);
+            unbreaking.cost = 5*Math.pow(unbreaking.increase, unbreaking.level);
             i = 0;
             while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
                 i += 1;
@@ -152,14 +166,22 @@ function update() {
             }
             efficiency.max = i;
             i = 0;
-            while(money > fortune.cost + 20*Math.pow(fortune.increase, fortune.level + i)) {
+            while(money > fortune.cost + 1*Math.pow(fortune.increase, fortune.level + i)) {
                 i += 1;
-                fortune.cost += 20*Math.pow(fortune.increase, fortune.level + i)
+                fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i)
             }
             fortune.max = i;
             i = 0;
+            while(money > unbreaking.cost + 5*Math.pow(unbreaking.increase, unbreaking.level + i)) {
+                i += 1;
+                unbreaking.cost += 5*Math.pow(unbreaking.increase, unbreaking.level + i);
+            }
+            unbreaking.max = i;
+            i = 0;
         }
-
+        
+        if (money >= unbreaking.cost) { document.querySelector("#unbreakingButton").classList.replace("unavailable", "available");
+        } else { document.querySelector("#unbreakingButton").classList.replace("available", "unavailable"); }
         if (money >= efficiency.cost) { document.querySelector("#efficiencyButton").classList.replace("unavailable", "available");
         } else { document.querySelector("#efficiencyButton").classList.replace("available", "unavailable"); }
         if (money >= fortune.cost) { document.querySelector("#fortuneButton").classList.replace("unavailable", "available");
@@ -187,6 +209,8 @@ function update() {
             document.querySelector("#buyMax").classList.replace("unavailable", "available");
         }
 
+        document.querySelector("#unbreakingButton").innerHTML = "€" + convert(unbreaking.cost);
+        document.querySelector("#unbreakingLevel").innerHTML = "Lvl " + convert(unbreaking.level);
         document.querySelector("#efficiencyButton").innerHTML = "€" + convert(efficiency.cost);
         document.querySelector("#efficiencyLevel").innerHTML = "Lvl " + convert(efficiency.level);
         document.querySelector("#fortuneButton").innerHTML = "€" + convert(fortune.cost);
@@ -252,7 +276,11 @@ function update() {
     localStorage.setItem("cooldown", cooldown);
     document.querySelector("#moneyCounter").innerHTML = "€" + convert(money);
     cooldown += 0.01;
-    maxCooldown = 10 * Math.pow(0.9, efficiency.level);
+    if (cooldown >= maxCooldown) {
+        durability = unbreaking.level + 5;
+        cooldown = 0;
+    }
+    maxCooldown = 60 * Math.pow(0.9, efficiency.level);
 }
 
 function buyUpgrade(upgrade) {
@@ -264,6 +292,14 @@ function buyUpgrade(upgrade) {
         money -= autominer.cost;
         autominer.level += 1;
         autominer.cost = Math.pow(10, 2+autominer.level);
+    }
+    if (upgrade == "unbreaking" && money >= unbreaking.cost) {
+        money -= unbreaking.cost;
+        if (buyAmount != 0) {
+            unbreaking.level += buyAmount;
+        } else {
+            unbreaking.level += unbreaking.max;
+        }
     }
     if (upgrade == "efficiency" && money >= efficiency.cost) {
         money -= efficiency.cost;
@@ -301,10 +337,12 @@ function save() {
     localStorage.setItem("cooldown", cooldown);
     localStorage.setItem("efficiencyLevel", efficiency.level);
     localStorage.setItem("fortuneLevel", fortune.level);
+    localStorage.setItem("unbreakingLevel", unbreaking.level);
     localStorage.setItem("autominerLevel", autominer.level);
     localStorage.setItem("rank", rank.level);
     localStorage.setItem("currentBlock", currentBlock);
     localStorage.setItem("buyAmount", buyAmount);
+    localStorage.setItem("durability", durability);
 }
 
 function reset() {
@@ -314,17 +352,18 @@ function reset() {
 }
 
 function convert(number) {
+    if (number >= 1e21) { number = Math.round(number/1e19)/100 + " Sx"}
     if (number >= 1e18) { number = Math.round(number/1e16)/100 + " Qu"}
     else if (number >= 1e15) { number = Math.round(number/1e13)/100 + " Qa"}
     else if (number >= 1e12) { number = Math.round(number/1e10)/100 + " T"}
     else if (number >= 1e9) { number = Math.round(number/1e7)/100 + " B"}
     else if (number >= 1e6) { number = Math.round(number/1e4)/100 + " M"}
     else if (number >= 1e3) { number = Math.round(number/1e1)/100 + " K"}
-    else if (number < 1e3) { number = Math.round(number*10)/10}
+    else if (number < 1e3) { number = Math.round(number*100)/100}
     return number;
 }
 
 load();
 window.setInterval(update, 10);
 window.setInterval(automine, 100);
-window.setInterval(save, 1000);
+window.setInterval(save, 100);
