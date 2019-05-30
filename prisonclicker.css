@@ -22,19 +22,20 @@ body { height: 100%; }
     background-color: #477A1E;
     height: 15%;
     width: 100%;
-    text-align: center
+    text-align: center;
+    position: relative;
 }
 .middle{
     height: 65%;
     text-align: center;
+    position: relative;
 }
 .bottom{
     background-color: #8FCA5C;
     height: 20%;
     width: 100%;
-    position: relative;
-    bottom: 0px;
     font-size: 0px;
+    position: relative;
 }
 .menuButton{
     width: 25%;
@@ -63,37 +64,37 @@ body { height: 100%; }
     top: 5%;
     left: 69%;
     font-family: Minecrafter;
-    font-size: 40px;
+    font-size: 1.8vw;
     color: lightgray;
 }
 .upgradeName{
-    height: 30%;
+    height: 20%;
     width: 35%;
-    font-size: 30px;
+    font-size: 1.6vw;
     color: lightgray;
     border: black solid 2px;
     border-radius: 5px;
     position: absolute;
     top: 5%;
     left: 1%;
-    line-height: 180%;
+    padding-top: 2%;
 }
 .upgradeLevel{
-    height: 30%;
+    height: 20%;
     width: 29%;
-    font-size: 30px;
+    font-size: 1.6vw;
     color: lightgray;
     border: black solid 2px;
     border-radius: 5px;
     position: absolute;
     top: 5%;
     left: 37%;
-    line-height: 180%;
+    padding-top: 2%;
 }
 .upgradeDescription{
     height: 50%;
     width: 65%;
-    font-size: 20px;
+    font-size: 1.1vw;
     color: lightgray;
     border: black solid 2px;
     border-radius: 5px;
@@ -109,7 +110,7 @@ body { height: 100%; }
     border: black solid 2px;
     height: 90%;
     margin-top: 0.5%;
-    font-size: 20px;
+    font-size: 1vw;
 }
 .available{
     background-color: green;
@@ -120,23 +121,32 @@ body { height: 100%; }
 .vertical{ margin-top: 2%;}
 /*/ ID's /*/
 #block{
-    width:300px;
-    height:300px;
+    width:50%;
+    height:70%;
     background-color: #854F2B;
     background-image: url("Images/Stone.png");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 80%;
     border: none;
-    margin: 9% auto;
+    position: absolute;
+    top: 15%;
+    left: 25%;
     cursor: url("Images/Diamond_Pickaxe.png"), auto;
 }
 #moneyCounter{
-    font-size: 80px;
-    position: relative;
-    top: 40px;
+    font-size: 5vw;
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    left: 10%;
+    top: 10%;
 }
 #cooldownBar{
     width: 80%;
-    margin: auto;
-    margin-top: 1%;
+    position: absolute;
+    top: 3%;
+    left: 10%;
     border: black solid 1px;
     border-radius: 5px;
     height: 10%;  
@@ -144,15 +154,18 @@ body { height: 100%; }
 #progressBar{
     height: 100%;
     width: 0%;
-    background-color: #C28340;
+    background-color: rgb(45, 140, 172);
     border: none;
     border-radius: 5px;
 }
 #cooldownTimer{
-    font-size: 20px;
-    position: relative;
+    font-size: 2vw;
+    position: absolute;
     bottom: 100%;
-    padding-top: 3%;
+    height: 20%;
+    width: 80%;
+    top: 20%;
+    left: 10%;
 }
 #durabilityBar{
     width: 80%;
@@ -161,19 +174,25 @@ body { height: 100%; }
     border: black solid 1px;
     border-radius: 5px;
     height: 10%;
+    position: absolute;
+    top: 85%;
+    left: 10%;
 }
 #durabilityLeft{
     height: 100%;
     width: 0%;
-    background-color: blue;
+    background-color: orange;
     border: none;
     border-radius: 5px;
 }
 #durabilityCounter{
-    font-size: 20px;
-    position: relative;
+    font-size: 2vw;
+    position: absolute;
     bottom: 100%;
-    padding-top: 3%;
+    height: 20%;
+    width: 80%;
+    top: 20%;
+    left: 10%;
 }
 #upgradesPage{
     overflow-y: scroll;
@@ -193,28 +212,35 @@ body { height: 100%; }
     border-radius: 5px;
     width: 95%;
     height: 40%;
-    margin: auto;
-    margin-top: 1%;
     background-color: #61371F;
+    position: absolute;
+    left: 2.5%;
+    top: 2.5%;
 }
 #autominerButton{
     width: 40%;
     border: black solid 2px;
     border-radius: 5px;
     height: 50%;
-    margin: auto;
-    margin-top: 3%;
+    position: absolute;
+    left: 30%;
+    top: 45%;
 }
 #autominerDescription{
     font-size: 40px;
-    margin-top: 1%;
+    position: absolute;
+    top: 1%;
 }
 #autominerChance{
     font-size: 80px;
-    margin-top: 4%;
+    position: absolute;
+    top: 50%;
+    width: 50%;
+    left: 25%;
 }
 #autominerCost{
-    margin-top: 25%;
+    position: absolute;
+    top: 30%;
     font-size: 40px;
 }
 #rank{
@@ -223,27 +249,30 @@ body { height: 100%; }
     background-color: #61371F;
     border: black solid 2px;
     border-radius: 5px;
-    margin: auto;
-    margin-top: 0.5%;
+    position: absolute;
+    left: 25%;
+    top: 5%;
     font-size: 200px;
 }
 #currentMultiplier{
     width: 40%;
-    margin: auto;
-    margin-top: 1%;
-    height: 15%;
+    position: absolute;
+    left: 30%;
+    top: 37%;
+    height: 13%;
     font-size: 30px;
     display: inline-block;
     background-color: #61371F;
     border: black solid 2px;
     border-radius: 5px;
-    line-height: 150%;
+    padding-top: 2%;
 }
 #rankButton{
     width: 60%;
     height: 25%;
-    margin: auto;
-    margin-top: 1%;
+    position: absolute;
+    left: 20%;
+    top: 57%;
     border: black solid 2px;
     border-radius: 5px;
     font-size: 40px;
