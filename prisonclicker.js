@@ -7,6 +7,7 @@ var maxCooldown = 60;
 var durability = 5;
 var buyAmount = 1;
 var now;
+var explosions;
 var lastMine = new Date();
 var rank = {
     cost: 100, 
@@ -42,6 +43,13 @@ var multiclick = {
     increase: 1.1,
     effect: 1.05,
 }
+var explosion = {
+    cost: 1e6,
+    level: 0,
+    max: 0,
+    increase: 1.3,
+    effect: 1,
+}
 var autominer = {
     level: 0,
     cost: 100,
@@ -55,6 +63,7 @@ function load() {
         fortune.level = Number(localStorage.getItem("fortuneLevel"));
         unbreaking.level = Number(localStorage.getItem("unbreakingLevel"));
         multiclick.level = Number(localStorage.getItem("multiclickLevel"));
+        explosion.level = Number(localStorage.getItem("explosionLevel"));
         autominer.level = Number(localStorage.getItem("autominerLevel"));
         rank.level = Number(localStorage.getItem("rank"));
         currentBlock = Number(localStorage.getItem("currentBlock"));
@@ -76,53 +85,58 @@ function load() {
 }
 
 function mine() {
-    i = Math.pow(multiclick.effect, multiclick.level);
-    multichance = Math.random()*100;
-    console.log(multichance);
-    multiclicks = 1;
-    while (multichance < i) { i /= 2; multiclicks += 1; }
+    addedMoney = 0;
+    if (durability > 0) {
+        lastMine = new Date();
+        durability -= 1;
+        switch(currentBlock) {
+            case 0: addedMoney += 1; break;
+            case 1: addedMoney += 2; break;
+            case 2: addedMoney += 4; break;
+            case 3: addedMoney += 8; break;
+            case 4: addedMoney += 16; break;
+            case 5: addedMoney += 32; break;
+            case 6: addedMoney += 64; break;
+            case 7: addedMoney += 128; break;
+        }
+        j = explosion.level;
+        chance = Math.random()*100;
+        explosions = 1;
+        while (chance < j) { j -= 10; explosions += 1; }
 
-    for (i = 0; i < multiclicks; i++) {
-        addedMoney = 0;
-        if (durability > 0) {
-            lastMine = new Date();
-            durability -= 1;
+        i = Math.pow(multiclick.effect, multiclick.level);
+        chance = Math.random()*100;
+        multiclicks = 1;
+        while (chance < i) { i /= 2; multiclicks += 1; }
+
+        addedMoney *= explosions * multiclicks;
+        addedMoney *= Math.pow(fortune.effect, fortune.level);
+        addedMoney *= rank.multiplier;
+        money += addedMoney;
+
+        chance = Math.random() * 100;
+        if (chance < 0.25) { currentBlock = 7 }
+        else if (chance < 0.75) { currentBlock = 6 }
+        else if (chance < 1.75) { currentBlock = 5 }
+        else if (chance < 4.25) { currentBlock = 4 }
+        else if (chance < 9.25) { currentBlock = 3 }
+        else if (chance < 19.25) { currentBlock = 2 }
+        else if (chance < 49.25) { currentBlock = 1 }
+        else { currentBlock = 0 }
+        if (document.URL.includes("index")) {
             switch(currentBlock) {
-                case 0: addedMoney += 1; break;
-                case 1: addedMoney += 2; break;
-                case 2: addedMoney += 4; break;
-                case 3: addedMoney += 8; break;
-                case 4: addedMoney += 16; break;
-                case 5: addedMoney += 32; break;
-                case 6: addedMoney += 64; break;
-                case 7: addedMoney += 128; break;
-            }
-            addedMoney *= Math.pow(fortune.effect, fortune.level);
-            addedMoney *= rank.multiplier;
-            money += addedMoney;
-
-            chance = Math.random() * 100;
-            if (chance < 0.25) { currentBlock = 7 }
-            else if (chance < 0.75) { currentBlock = 6 }
-            else if (chance < 1.75) { currentBlock = 5 }
-            else if (chance < 4.25) { currentBlock = 4 }
-            else if (chance < 9.25) { currentBlock = 3 }
-            else if (chance < 19.25) { currentBlock = 2 }
-            else if (chance < 49.25) { currentBlock = 1 }
-            else { currentBlock = 0 }
-            if (document.URL.includes("index")) {
-                switch(currentBlock) {
-                    case 0: eBlock.style.backgroundImage = "url(Images/Stone.png)"; break;
-                    case 1: eBlock.style.backgroundImage = "url(Images/Coal_Ore.png)"; break;
-                    case 2: eBlock.style.backgroundImage = "url(Images/Iron_Ore.png)"; break;
-                    case 3: eBlock.style.backgroundImage = "url(Images/Redstone_Ore.png)"; break;
-                    case 4: eBlock.style.backgroundImage = "url(Images/Lapis_Lazuli_Ore.png)"; break;
-                    case 5: eBlock.style.backgroundImage = "url(Images/Gold_Ore.png)"; break;
-                    case 6: eBlock.style.backgroundImage = "url(Images/Diamond_Ore.png)"; break;
-                    case 7: eBlock.style.backgroundImage = "url(Images/Emerald_Ore.png)"; break;
-                }
+                case 0: eBlock.style.backgroundImage = "url(Images/Stone.png)"; break;
+                case 1: eBlock.style.backgroundImage = "url(Images/Coal_Ore.png)"; break;
+                case 2: eBlock.style.backgroundImage = "url(Images/Iron_Ore.png)"; break;
+                case 3: eBlock.style.backgroundImage = "url(Images/Redstone_Ore.png)"; break;
+                case 4: eBlock.style.backgroundImage = "url(Images/Lapis_Lazuli_Ore.png)"; break;
+                case 5: eBlock.style.backgroundImage = "url(Images/Gold_Ore.png)"; break;
+                case 6: eBlock.style.backgroundImage = "url(Images/Diamond_Ore.png)"; break;
+                case 7: eBlock.style.backgroundImage = "url(Images/Emerald_Ore.png)"; break;
             }
         }
+        document.querySelector("#explosionCount").innerHTML = + explosions + "x";
+        document.querySelector("#multiclickCount").innerHTML = + multiclicks + "x";
     }
 }
 
@@ -153,22 +167,26 @@ function update() {
             fortune.cost = 1*Math.pow(fortune.increase, fortune.level);
             unbreaking.cost = 5*Math.pow(unbreaking.increase, unbreaking.level);
             multiclick.cost = 1000*Math.pow(multiclick.increase, multiclick.level);
+            explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
         } else if (buyAmount == 10 || buyAmount == 100) {
             efficiency.cost = 0;
             fortune.cost = 0;
             unbreaking.cost = 0;
             multiclick.cost = 0;
+            explosion.cost = 0;
             for (i = 0; i < buyAmount; i++) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
                 fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i);
                 unbreaking.cost += 5*Math.pow(unbreaking.increase, unbreaking.level + i);
                 multiclick.cost += 1000*Math.pow(multiclick.increase, multiclick.level + i);
+                explosion.cost += 1e6*Math.pow(explosion.increase, explosion.level + i);
             }
         } else if (buyAmount == 0) {
             efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
             fortune.cost = 1*Math.pow(fortune.increase, fortune.level);
             unbreaking.cost = 5*Math.pow(unbreaking.increase, unbreaking.level);
             multiclick.cost = 1000*Math.pow(multiclick.increase, multiclick.level);
+            explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
             i = 0;
             while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
@@ -194,6 +212,12 @@ function update() {
             }
             multiclick.max = i;
             i = 0;
+            while(money > explosion.cost + 1e6*Math.pow(explosion.increase, explosion.level + i)) {
+                explosion.cost += 1e6*Math.pow(explosion.increase, explosion.level + i);
+                i += 1;
+            }
+            explosion.max = i;
+            i = 0;
         }
         
         if (money >= unbreaking.cost) { document.querySelector("#unbreakingButton").classList.replace("unavailable", "available");
@@ -204,6 +228,8 @@ function update() {
         } else { document.querySelector("#fortuneButton").classList.replace("available", "unavailable"); }
         if (money >= multiclick.cost) { document.querySelector("#multiclickButton").classList.replace("unavailable", "available");
         } else { document.querySelector("#multiclickButton").classList.replace("available", "unavailable"); }
+        if (money >= explosion.cost) { document.querySelector("#explosionButton").classList.replace("unavailable", "available");
+        } else { document.querySelector("#explosionButton").classList.replace("available", "unavailable"); }
         
         if (buyAmount == 1) {
             document.querySelector("#buy1").classList.replace("unavailable", "available");
@@ -237,6 +263,9 @@ function update() {
         document.querySelector("#multiclickButton").innerHTML = "€" + convert(multiclick.cost);
         document.querySelector("#multiclickLevel").innerHTML = "Lvl " + convert(multiclick.level);
         document.querySelector("#multiclickDescription").innerHTML = "Multiclick will increase the chance of using multiple clicks at once by 5% per level! (" + convert(Math.pow(multiclick.effect, multiclick.level)) + "%)";
+        document.querySelector("#explosionButton").innerHTML = "€" + convert(explosion.cost);
+        document.querySelector("#explosionLevel").innerHTML = "Lvl " + convert(explosion.level);
+        document.querySelector("#explosionDescription").innerHTML = "Explosion will increase the chance that you will mine multiple blocks with one click! (" + explosion.level*explosion.effect + "%)";
     }
     // AUTOMINER PAGE //
     if (document.URL.includes("autominer")) {
@@ -259,8 +288,8 @@ function update() {
             document.querySelector("#rankButton").classList.add("unavailable");
             document.querySelector("#rankButton").classList.remove("available");
         }
-        document.querySelector("#rank").innerHTML = rank.letter;
-        document.querySelector("#currentMultiplier").innerHTML = "Current Multiplier: <br />" + convert(rank.multiplier);
+        document.querySelector("#currentRank").innerHTML = rank.letter;
+        document.querySelector("#currentMultiplier").innerHTML = "Multiplier: <br />" + convert(rank.multiplier);
         document.querySelector("#rankButton").innerHTML = "Get next rank for: <br />" + convert(rank.cost);
     }
     
@@ -346,6 +375,14 @@ function buyUpgrade(upgrade) {
             multiclick.level += multiclick.max;
         }
     }
+    if (upgrade == "explosion" && money >= multiclick.cost) {
+        money -= explosion.cost;
+        if (buyAmount != 0) {
+            explosion.level += buyAmount;
+        } else {
+            explosion.level += explosion.max
+        }
+    }
 
 }
 
@@ -368,6 +405,7 @@ function save() {
     localStorage.setItem("fortuneLevel", fortune.level);
     localStorage.setItem("unbreakingLevel", unbreaking.level);
     localStorage.setItem("multiclickLevel", multiclick.level);
+    localStorage.setItem("explosionLevel", explosion.level);
     localStorage.setItem("autominerLevel", autominer.level);
     localStorage.setItem("rank", rank.level);
     localStorage.setItem("currentBlock", currentBlock);

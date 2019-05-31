@@ -1,6 +1,6 @@
 @font-face{
     font-family: Minecrafter;
-    src: url("Images/Minecrafter.Reg.ttf");
+    src: url("Images/Pixel-Miners.otf");
 }
 *{
     padding: 0px;
@@ -122,15 +122,15 @@ body { height: 100%; }
 /*/ ID's /*/
 #block{
     width:50%;
-    height:70%;
+    height:60%;
     background-color: #854F2B;
     background-image: url("Images/Stone.png");
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    background-size: 80%;
+    background-size: 75%;
     border: none;
     position: absolute;
-    top: 15%;
+    top: 25%;
     left: 25%;
     cursor: url("Images/Diamond_Pickaxe.png"), auto;
 }
@@ -140,7 +140,7 @@ body { height: 100%; }
     width: 80%;
     height: 80%;
     left: 10%;
-    top: 10%;
+    top: 30%;
 }
 #cooldownBar{
     width: 80%;
@@ -193,6 +193,42 @@ body { height: 100%; }
     width: 80%;
     top: 20%;
     left: 10%;
+}
+#clickInfo{
+    position: absolute;
+    width: 40%;
+    left: 30%;
+    height: 8%;
+    top: 15%;
+    text-align: center;
+}
+#tntImg{
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    left: 10%;
+}
+#explosionCount{
+    position: absolute;
+    width: 15%;
+    height: 50%;
+    top: 25%;
+    left: 25%;
+    font-size: 1.5vw;
+}
+#multiclickImg{
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    left: 60%;
+}
+#multiclickCount{
+    position: absolute;
+    width: 15%;
+    height: 50%;
+    top: 25%;
+    left: 75%;
+    font-size: 1.5vw;
 }
 #upgradesPage{
     overflow-y: scroll;
@@ -252,7 +288,14 @@ body { height: 100%; }
     position: absolute;
     left: 25%;
     top: 5%;
-    font-size: 200px;
+    font-size: 8vw;
+}
+#currentRank{
+    position: absolute;
+    width: 50%;
+    height: 10%;
+    top: 17%;
+    left: 25%;
 }
 #currentMultiplier{
     width: 40%;
