@@ -137,9 +137,8 @@ body { height: 100%; }
 #moneyCounter{
     font-size: 5vw;
     position: absolute;
-    width: 80%;
+    width: 100%;
     height: 80%;
-    left: 10%;
     top: 30%;
 }
 #cooldownBar{

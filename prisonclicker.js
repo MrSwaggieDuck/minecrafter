@@ -50,6 +50,13 @@ var explosion = {
     increase: 1.3,
     effect: 1,
 }
+var looting = {
+    cost: 1e9,
+    level: 0,
+    max: 0,
+    increase: 1.6,
+    effect: 1.2,
+}
 var autominer = {
     level: 0,
     cost: 100,
@@ -64,6 +71,7 @@ function load() {
         unbreaking.level = Number(localStorage.getItem("unbreakingLevel"));
         multiclick.level = Number(localStorage.getItem("multiclickLevel"));
         explosion.level = Number(localStorage.getItem("explosionLevel"));
+        looting.level = Number(localStorage.getItem("lootingLevel"));
         autominer.level = Number(localStorage.getItem("autominerLevel"));
         rank.level = Number(localStorage.getItem("rank"));
         currentBlock = Number(localStorage.getItem("currentBlock"));
@@ -110,7 +118,7 @@ function mine() {
         while (chance < i) { i /= 2; multiclicks += 1; }
 
         addedMoney *= explosions * multiclicks;
-        addedMoney *= Math.pow(fortune.effect, fortune.level);
+        addedMoney *= Math.pow(fortune.effect, fortune.level) * Math.pow(looting.effect, looting.level);
         addedMoney *= rank.multiplier;
         money += addedMoney;
 
@@ -145,7 +153,7 @@ function automine() {
     if (autominer.level > 0) {
         if (Math.random()*100 < Math.pow((now - lastMine)/1000, autominer.level/3)) { mine() }
     }
-    if (Math.pow((now - lastMine)/1000, autominer.level/3) > 0 && document.URL.includes("autominer")) {
+    if (autominer.level > 0 && document.URL.includes("autominer")) {
         document.querySelector("#autominerChance").innerHTML = Math.round(Math.pow((now - lastMine)/1000, autominer.level/3)*100)/100 + "%";
     } else if (document.URL.includes("autominer")) {
         document.querySelector("#autominerChance").innerHTML = 0 + "%";
@@ -168,18 +176,16 @@ function update() {
             unbreaking.cost = 5*Math.pow(unbreaking.increase, unbreaking.level);
             multiclick.cost = 1000*Math.pow(multiclick.increase, multiclick.level);
             explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
+            looting.cost = 1e9*Math.pow(looting.increase, looting.level);
         } else if (buyAmount == 10 || buyAmount == 100) {
-            efficiency.cost = 0;
-            fortune.cost = 0;
-            unbreaking.cost = 0;
-            multiclick.cost = 0;
-            explosion.cost = 0;
+            efficiency.cost = fortune.cost = unbreaking.cost = multiclick.cost = explosion.cost = looting.cost = 0;
             for (i = 0; i < buyAmount; i++) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
                 fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i);
                 unbreaking.cost += 5*Math.pow(unbreaking.increase, unbreaking.level + i);
                 multiclick.cost += 1000*Math.pow(multiclick.increase, multiclick.level + i);
                 explosion.cost += 1e6*Math.pow(explosion.increase, explosion.level + i);
+                looting.cost += 1e9*Math.pow(looting.increase, looting.level + i);
             }
         } else if (buyAmount == 0) {
             efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
@@ -187,6 +193,7 @@ function update() {
             unbreaking.cost = 5*Math.pow(unbreaking.increase, unbreaking.level);
             multiclick.cost = 1000*Math.pow(multiclick.increase, multiclick.level);
             explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
+            looting.cost = 1e9*Math.pow(looting.increase, looting.level);
             i = 0;
             while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
@@ -218,6 +225,12 @@ function update() {
             }
             explosion.max = i;
             i = 0;
+            while(money > looting.cost + 1e9*Math.pow(looting.increase, looting.level + i)) {
+                looting.cost += 1e9*Math.pow(looting.increase, looting.level + i);
+                i += 1;
+            }
+            looting.max = i;
+            i = 0;
         }
         
         if (money >= unbreaking.cost) { document.querySelector("#unbreakingButton").classList.replace("unavailable", "available");
@@ -230,6 +243,8 @@ function update() {
         } else { document.querySelector("#multiclickButton").classList.replace("available", "unavailable"); }
         if (money >= explosion.cost) { document.querySelector("#explosionButton").classList.replace("unavailable", "available");
         } else { document.querySelector("#explosionButton").classList.replace("available", "unavailable"); }
+        if (money >= looting.cost) { document.querySelector("#lootingButton").classList.replace("unavailable", "available");
+        } else { document.querySelector("#lootingButton").classList.replace("available", "unavailable"); }
         
         if (buyAmount == 1) {
             document.querySelector("#buy1").classList.replace("unavailable", "available");
@@ -266,6 +281,9 @@ function update() {
         document.querySelector("#explosionButton").innerHTML = "€" + convert(explosion.cost);
         document.querySelector("#explosionLevel").innerHTML = "Lvl " + convert(explosion.level);
         document.querySelector("#explosionDescription").innerHTML = "Explosion will increase the chance that you will mine multiple blocks with one click! (" + explosion.level*explosion.effect + "%)";
+        document.querySelector("#lootingButton").innerHTML = "€" + convert(looting.cost);
+        document.querySelector("#lootingLevel").innerHTML = "Lvl " + convert(looting.level);
+        document.querySelector("#lootingDescription").innerHTML = "Looting increases the amount of money you get by 20%! (" + convert(Math.pow(looting.effect, looting.level)) + "x)";
     }
     // AUTOMINER PAGE //
     if (document.URL.includes("autominer")) {
@@ -383,6 +401,14 @@ function buyUpgrade(upgrade) {
             explosion.level += explosion.max
         }
     }
+    if (upgrade == "looting" && money >= looting.cost) {
+        money -= looting.cost;
+        if (buyAmount != 0) {
+            looting.level += buyAmount;
+        } else {
+            looting.level += looting.max;
+        }
+    }
 
 }
 
@@ -406,6 +432,7 @@ function save() {
     localStorage.setItem("unbreakingLevel", unbreaking.level);
     localStorage.setItem("multiclickLevel", multiclick.level);
     localStorage.setItem("explosionLevel", explosion.level);
+    localStorage.setItem("lootingLevel", looting.level);
     localStorage.setItem("autominerLevel", autominer.level);
     localStorage.setItem("rank", rank.level);
     localStorage.setItem("currentBlock", currentBlock);
@@ -420,7 +447,9 @@ function reset() {
 }
 
 function convert(number) {
-    if (number >= 1e21) { number = Math.round(number/1e19)/100 + " Sx"}
+    if (number > 1e27) { number = Math.round(number/1e25)/100 + " Oc"}
+    else if (number > 1e24) {number = Math.floor(number/1e22)/100 + " Sp"}
+    else if (number >= 1e21) { number = Math.round(number/1e19)/100 + " Sx"}
     else if (number >= 1e18) { number = Math.round(number/1e16)/100 + " Qu"}
     else if (number >= 1e15) { number = Math.round(number/1e13)/100 + " Qa"}
     else if (number >= 1e12) { number = Math.round(number/1e10)/100 + " T"}
