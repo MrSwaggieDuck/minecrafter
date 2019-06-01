@@ -26,7 +26,7 @@ var fortune = {
     cost: 1,
     level: 0,
     max: 0,
-    increase: 1.025,
+    increase: 1.0275,
     effect: 1.01,
 }
 var unbreaking = {
@@ -57,9 +57,33 @@ var looting = {
     increase: 1.6,
     effect: 1.2,
 }
+var luck = {
+    cost: 1e15,
+    level: 0,
+    max: 0,
+    increase: 10,
+    effect: 1.1,
+}
 var autominer = {
     level: 0,
     cost: 100,
+}
+var ore = {
+    stone: 60.75,
+    coal: 20,
+    iron: 10,
+    redstone: 5,
+    lapis: 2.5,
+    gold: 1,
+    diamond: 0.5,
+    emerald: 0.25,
+}
+var prestige = {
+    button1: false,
+    button2: false,
+    button3: false,
+    level: 0,
+    multiplier: 1,
 }
 
 function load() {
@@ -72,8 +96,10 @@ function load() {
         multiclick.level = Number(localStorage.getItem("multiclickLevel"));
         explosion.level = Number(localStorage.getItem("explosionLevel"));
         looting.level = Number(localStorage.getItem("lootingLevel"));
+        luck.level = Number(localStorage.getItem("luckLevel"));
         autominer.level = Number(localStorage.getItem("autominerLevel"));
         rank.level = Number(localStorage.getItem("rank"));
+        prestige.level = Number(localStorage.getItem("prestigeLevel"));
         currentBlock = Number(localStorage.getItem("currentBlock"));
         buyAmount = Number(localStorage.getItem("buyAmount"));
         durability = Number(localStorage.getItem("durability"));
@@ -115,21 +141,21 @@ function mine() {
         i = Math.pow(multiclick.effect, multiclick.level);
         chance = Math.random()*100;
         multiclicks = 1;
-        while (chance < i) { i /= 2; multiclicks += 1; }
+        while (chance < i && durability > 0) { i /= 2; multiclicks += 1; durability -= 1;}
 
         addedMoney *= explosions * multiclicks;
         addedMoney *= Math.pow(fortune.effect, fortune.level) * Math.pow(looting.effect, looting.level);
-        addedMoney *= rank.multiplier;
+        addedMoney *= rank.multiplier * prestige.multiplier;
         money += addedMoney;
 
         chance = Math.random() * 100;
-        if (chance < 0.25) { currentBlock = 7 }
-        else if (chance < 0.75) { currentBlock = 6 }
-        else if (chance < 1.75) { currentBlock = 5 }
-        else if (chance < 4.25) { currentBlock = 4 }
-        else if (chance < 9.25) { currentBlock = 3 }
-        else if (chance < 19.25) { currentBlock = 2 }
-        else if (chance < 49.25) { currentBlock = 1 }
+        if (chance < ore.emerald) { currentBlock = 7 }
+        else if (chance < ore.emerald + ore.diamond) { currentBlock = 6 }
+        else if (chance < ore.emerald + ore.diamond + ore.gold) { currentBlock = 5 }
+        else if (chance < ore.emerald + ore.diamond + ore.gold + ore.lapis) { currentBlock = 4 }
+        else if (chance < ore.emerald + ore.diamond + ore.gold + ore.lapis + ore.redstone) { currentBlock = 3 }
+        else if (chance < ore.emerald + ore.diamond + ore.gold + ore.lapis + ore.redstone + ore.iron) { currentBlock = 2 }
+        else if (chance < ore.emerald + ore.diamond + ore.gold + ore.lapis + ore.redstone + ore.iron + ore.coal) { currentBlock = 1 }
         else { currentBlock = 0 }
         if (document.URL.includes("index")) {
             switch(currentBlock) {
@@ -142,9 +168,9 @@ function mine() {
                 case 6: eBlock.style.backgroundImage = "url(Images/Diamond_Ore.png)"; break;
                 case 7: eBlock.style.backgroundImage = "url(Images/Emerald_Ore.png)"; break;
             }
+            document.querySelector("#explosionCount").innerHTML = + explosions + "x";
+            document.querySelector("#multiclickCount").innerHTML = + multiclicks + "x";
         }
-        document.querySelector("#explosionCount").innerHTML = + explosions + "x";
-        document.querySelector("#multiclickCount").innerHTML = + multiclicks + "x";
     }
 }
 
@@ -177,8 +203,9 @@ function update() {
             multiclick.cost = 1000*Math.pow(multiclick.increase, multiclick.level);
             explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
             looting.cost = 1e9*Math.pow(looting.increase, looting.level);
+            luck.cost = 1e15*Math.pow(luck.increase,  luck.level);
         } else if (buyAmount == 10 || buyAmount == 100) {
-            efficiency.cost = fortune.cost = unbreaking.cost = multiclick.cost = explosion.cost = looting.cost = 0;
+            efficiency.cost = fortune.cost = unbreaking.cost = multiclick.cost = explosion.cost = looting.cost = luck.cost = 0;
             for (i = 0; i < buyAmount; i++) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
                 fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i);
@@ -186,6 +213,7 @@ function update() {
                 multiclick.cost += 1000*Math.pow(multiclick.increase, multiclick.level + i);
                 explosion.cost += 1e6*Math.pow(explosion.increase, explosion.level + i);
                 looting.cost += 1e9*Math.pow(looting.increase, looting.level + i);
+                luck.cost += 1e15*Math.pow(luck.increase, luck.level + i);
             }
         } else if (buyAmount == 0) {
             efficiency.cost = 10*Math.pow(efficiency.increase, efficiency.level);
@@ -194,6 +222,7 @@ function update() {
             multiclick.cost = 1000*Math.pow(multiclick.increase, multiclick.level);
             explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
             looting.cost = 1e9*Math.pow(looting.increase, looting.level);
+            luck.cost = 1e15*Math.pow(luck.increase, luck.level);
             i = 0;
             while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
                 efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
@@ -231,6 +260,12 @@ function update() {
             }
             looting.max = i;
             i = 0;
+            while(money > luck.cost + 1e15*Math.pow(luck.increase, luck.level + i)) {
+                luck.cost += 1e15*Math.pow(luck.increase, luck.level + i);
+                i += 1;
+            }
+            luck.max = i;
+            i = 0;
         }
         
         if (money >= unbreaking.cost) { document.querySelector("#unbreakingButton").classList.replace("unavailable", "available");
@@ -245,6 +280,8 @@ function update() {
         } else { document.querySelector("#explosionButton").classList.replace("available", "unavailable"); }
         if (money >= looting.cost) { document.querySelector("#lootingButton").classList.replace("unavailable", "available");
         } else { document.querySelector("#lootingButton").classList.replace("available", "unavailable"); }
+        if (money >= luck.cost) { document.querySelector("#luckButton").classList.replace("unavailable", "available");
+        } else { document.querySelector("#luckButton").classList.replace("available", "unavailable"); }
         
         if (buyAmount == 1) {
             document.querySelector("#buy1").classList.replace("unavailable", "available");
@@ -284,6 +321,8 @@ function update() {
         document.querySelector("#lootingButton").innerHTML = "€" + convert(looting.cost);
         document.querySelector("#lootingLevel").innerHTML = "Lvl " + convert(looting.level);
         document.querySelector("#lootingDescription").innerHTML = "Looting increases the amount of money you get by 20%! (" + convert(Math.pow(looting.effect, looting.level)) + "x)";
+        document.querySelector("#luckButton").innerHTML = "€" + convert(luck.cost);
+        document.querySelector("#luckLevel").innerHTML = "Lvl " + convert(luck.level);
     }
     // AUTOMINER PAGE //
     if (document.URL.includes("autominer")) {
@@ -306,40 +345,65 @@ function update() {
             document.querySelector("#rankButton").classList.add("unavailable");
             document.querySelector("#rankButton").classList.remove("available");
         }
-        document.querySelector("#currentRank").innerHTML = rank.letter;
+        if (prestige.level > 0) {
+            document.querySelector("#currentRank").innerHTML = rank.letter + prestige.level;
+        } else {
+            document.querySelector("#currentRank").innerHTML = rank.letter;
+        }
+        
         document.querySelector("#currentMultiplier").innerHTML = "Multiplier: <br />" + convert(rank.multiplier);
         document.querySelector("#rankButton").innerHTML = "Get next rank for: <br />" + convert(rank.cost);
     }
-    
+    // PRESTIGE PAGE //
+    if (document.URL.includes("prestige")) {
+        if (rank.level == 26) {
+            document.querySelector("#prestigeDescription").innerHTML = "You are ready to prestige!";
+        } else {
+            document.querySelector("#prestigeDescription").innerHTML = "Reach rank Z to unlock prestige..."
+        }
+        if (prestige.button1 == true && prestige.button2 == true && prestige.button3 == true) {
+            prestigeF();
+            prestige.button1 = prestige.button2 = prestige.button3 = false;
+
+        }
+    }
     
     switch (rank.level) {
         case 1: rank = { level: 1, letter: "A", cost: 100, multiplier: 1, }; break;
-        case 2: rank = { level: 2, letter: "B", cost: 100*Math.pow(5, 1), multiplier: Math.pow(2, 1), }; break;
-        case 3: rank = { level: 3, letter: "C", cost: 100*Math.pow(5, 2), multiplier: Math.pow(2, 2), }; break;
-        case 4: rank = { level: 4, letter: "D", cost: 100*Math.pow(5, 3), multiplier: Math.pow(2, 3), }; break;
-        case 5: rank = { level: 5, letter: "E", cost: 100*Math.pow(5, 4), multiplier: Math.pow(2, 4), }; break;
-        case 6: rank = { level: 6, letter: "F", cost: 100*Math.pow(5, 5), multiplier: Math.pow(2, 5), }; break;
-        case 7: rank = { level: 7, letter: "G", cost: 100*Math.pow(5, 6), multiplier: Math.pow(2, 6), }; break;
-        case 8: rank = { level: 8, letter: "H", cost: 100*Math.pow(5, 7), multiplier: Math.pow(2, 7), }; break;
-        case 9: rank = { level: 9, letter: "I", cost: 100*Math.pow(5, 8), multiplier: Math.pow(2, 8), }; break;
-        case 10: rank = { level: 10, letter: "J", cost: 100*Math.pow(5, 9), multiplier: Math.pow(2, 9), }; break;
-        case 11: rank = { level: 11, letter: "K", cost: 100*Math.pow(5, 10), multiplier: Math.pow(2, 10), }; break;
-        case 12: rank = { level: 12, letter: "L", cost: 100*Math.pow(5, 11), multiplier: Math.pow(2, 11), }; break;
-        case 13: rank = { level: 13, letter: "M", cost: 100*Math.pow(5, 12), multiplier: Math.pow(2, 12), }; break;
-        case 14: rank = { level: 14, letter: "N", cost: 100*Math.pow(5, 13), multiplier: Math.pow(2, 13), }; break;
-        case 15: rank = { level: 15, letter: "O", cost: 100*Math.pow(5, 14), multiplier: Math.pow(2, 14), }; break;
-        case 16: rank = { level: 16, letter: "P", cost: 100*Math.pow(5, 15), multiplier: Math.pow(2, 15), }; break;
-        case 17: rank = { level: 17, letter: "Q", cost: 100*Math.pow(5, 16), multiplier: Math.pow(2, 16), }; break;
-        case 18: rank = { level: 18, letter: "R", cost: 100*Math.pow(5, 17), multiplier: Math.pow(2, 17), }; break;
-        case 19: rank = { level: 19, letter: "S", cost: 100*Math.pow(5, 18), multiplier: Math.pow(2, 18), }; break;
-        case 20: rank = { level: 20, letter: "T", cost: 100*Math.pow(5, 19), multiplier: Math.pow(2, 19), }; break;
-        case 21: rank = { level: 21, letter: "U", cost: 100*Math.pow(5, 20), multiplier: Math.pow(2, 20), }; break;
-        case 22: rank = { level: 22, letter: "V", cost: 100*Math.pow(5, 21), multiplier: Math.pow(2, 21), }; break;
-        case 23: rank = { level: 23, letter: "W", cost: 100*Math.pow(5, 22), multiplier: Math.pow(2, 22), }; break;
-        case 24: rank = { level: 24, letter: "X", cost: 100*Math.pow(5, 23), multiplier: Math.pow(2, 23), }; break;
-        case 25: rank = { level: 25, letter: "Y", cost: 100*Math.pow(5, 24), multiplier: Math.pow(2, 24), }; break;
+        case 2: rank = { level: 2, letter: "B", cost: 100*Math.pow(5 + prestige.level*0.1, 1), multiplier: Math.pow(2, 1), }; break;
+        case 3: rank = { level: 3, letter: "C", cost: 100*Math.pow(5, + prestige.level*0.1), multiplier: Math.pow(2, 2), }; break;
+        case 4: rank = { level: 4, letter: "D", cost: 100*Math.pow(5 + prestige.level*0.1, 3), multiplier: Math.pow(2, 3), }; break;
+        case 5: rank = { level: 5, letter: "E", cost: 100*Math.pow(5 + prestige.level*0.1, 4), multiplier: Math.pow(2, 4), }; break;
+        case 6: rank = { level: 6, letter: "F", cost: 100*Math.pow(5 + prestige.level*0.1, 5), multiplier: Math.pow(2, 5), }; break;
+        case 7: rank = { level: 7, letter: "G", cost: 100*Math.pow(5 + prestige.level*0.1, 6), multiplier: Math.pow(2, 6), }; break;
+        case 8: rank = { level: 8, letter: "H", cost: 100*Math.pow(5 + prestige.level*0.1, 7), multiplier: Math.pow(2, 7), }; break;
+        case 9: rank = { level: 9, letter: "I", cost: 100*Math.pow(5 + prestige.level*0.1, 8), multiplier: Math.pow(2, 8), }; break;
+        case 10: rank = { level: 10, letter: "J", cost: 100*Math.pow(5 + prestige.level*0.1, 9), multiplier: Math.pow(2, 9), }; break;
+        case 11: rank = { level: 11, letter: "K", cost: 100*Math.pow(5 + prestige.level*0.1, 10), multiplier: Math.pow(2, 10), }; break;
+        case 12: rank = { level: 12, letter: "L", cost: 100*Math.pow(5 + prestige.level*0.1, 11), multiplier: Math.pow(2, 11), }; break;
+        case 13: rank = { level: 13, letter: "M", cost: 100*Math.pow(5 + prestige.level*0.1, 12), multiplier: Math.pow(2, 12), }; break;
+        case 14: rank = { level: 14, letter: "N", cost: 100*Math.pow(5 + prestige.level*0.1, 13), multiplier: Math.pow(2, 13), }; break;
+        case 15: rank = { level: 15, letter: "O", cost: 100*Math.pow(5 + prestige.level*0.1, 14), multiplier: Math.pow(2, 14), }; break;
+        case 16: rank = { level: 16, letter: "P", cost: 100*Math.pow(5 + prestige.level*0.1, 15), multiplier: Math.pow(2, 15), }; break;
+        case 17: rank = { level: 17, letter: "Q", cost: 100*Math.pow(5 + prestige.level*0.1, 16), multiplier: Math.pow(2, 16), }; break;
+        case 18: rank = { level: 18, letter: "R", cost: 100*Math.pow(5 + prestige.level*0.1, 17), multiplier: Math.pow(2, 17), }; break;
+        case 19: rank = { level: 19, letter: "S", cost: 100*Math.pow(5 + prestige.level*0.1, 18), multiplier: Math.pow(2, 18), }; break;
+        case 20: rank = { level: 20, letter: "T", cost: 100*Math.pow(5 + prestige.level*0.1, 19), multiplier: Math.pow(2, 19), }; break;
+        case 21: rank = { level: 21, letter: "U", cost: 100*Math.pow(5 + prestige.level*0.1, 20), multiplier: Math.pow(2, 20), }; break;
+        case 22: rank = { level: 22, letter: "V", cost: 100*Math.pow(5 + prestige.level*0.1, 21), multiplier: Math.pow(2, 21), }; break;
+        case 23: rank = { level: 23, letter: "W", cost: 100*Math.pow(5 + prestige.level*0.1, 22), multiplier: Math.pow(2, 22), }; break;
+        case 24: rank = { level: 24, letter: "X", cost: 100*Math.pow(5 + prestige.level*0.1, 23), multiplier: Math.pow(2, 23), }; break;
+        case 25: rank = { level: 25, letter: "Y", cost: 100*Math.pow(5 + prestige.level*0.1, 24), multiplier: Math.pow(2, 24), }; break;
         case 26: rank = { level: 26, letter: "Z", cost: "MAX RANK!", multiplier: 2e8, }; break;
     } 
+
+    ore.emerald = 0.25 * Math.pow(luck.effect, luck.level);
+    ore.diamond = 0.5 * Math.pow(luck.effect, luck.level);
+    ore.gold = 1 * Math.pow(luck.effect, luck.level);
+    ore.lapis = 2.5 * Math.pow(luck.effect, luck.level);
+    ore.redstone = 5 * Math.pow(luck.effect, luck.level);
+    ore.iron = 10 * Math.pow(luck.effect, luck.level);
+    ore.coal = 20 * Math.pow(luck.effect, luck.level)
 
     localStorage.setItem("cooldown", cooldown);
     document.querySelector("#moneyCounter").innerHTML = "€" + convert(money);
@@ -349,6 +413,7 @@ function update() {
         cooldown = 0;
     }
     maxCooldown = 60 * Math.pow(0.9, efficiency.level);
+    prestige.multiplier = Math.pow(1.5, prestige.level);
 }
 
 function buyUpgrade(upgrade) {
@@ -409,6 +474,14 @@ function buyUpgrade(upgrade) {
             looting.level += looting.max;
         }
     }
+    if (upgrade == "luck" && money >= luck.cost) {
+        money -= luck.cost;
+        if (buyAmount != 0) {
+            luck.level += buyAmount;
+        } else {
+            luck.level += luck.max;
+        }
+    }
 
 }
 
@@ -424,6 +497,56 @@ function setBuyAmount(amount) {
     }
 }
 
+function prestigeButton(button) {
+    if (button == "1" && rank.level == 26) {
+        switch(prestige.button1) {
+            case false: 
+                prestige.button1 = true;
+                document.querySelector("#prestige1").classList.replace("unavailable", "available");
+                break;
+            case true:
+                prestige.button1 = false;
+                document.querySelector("#prestige1").classList.replace("available", "unavailable");
+                break;
+        }
+    }
+    if (button == "2" && rank.level == 26) {
+        switch(prestige.button2) {
+            case false: 
+                prestige.button2 = true;
+                document.querySelector("#prestige2").classList.replace("unavailable", "available");
+                break;
+            case true:
+                prestige.button2 = false;
+                document.querySelector("#prestige2").classList.replace("available", "unavailable");
+                break;
+        }
+    }
+    if (button == "3" && rank.level == 26) {
+        switch(prestige.button3) {
+            case false: 
+                prestige.button3 = true;
+                document.querySelector("#prestige3").classList.replace("unavailable", "available");
+                break;
+            case true:
+                prestige.button3 = false;
+                document.querySelector("#prestige3").classList.replace("available", "unavailable");
+                break;
+        }
+    }
+}
+
+function prestigeF() {
+    document.querySelector("#prestige1").classList.replace("available", "unavailable");
+    document.querySelector("#prestige2").classList.replace("available", "unavailable");
+    document.querySelector("#prestige3").classList.replace("available", "unavailable");
+    money = unbreaking.level = efficiency.level = fortune.level = multiclick.level = explosion.level = looting.level = luck.level = 0;
+    rank.level = 1;
+    prestige.level += 1;
+    save();
+    window.location.href = "index.html";
+}
+
 function save() {
     localStorage.setItem("money", money);
     localStorage.setItem("cooldown", cooldown);
@@ -433,8 +556,10 @@ function save() {
     localStorage.setItem("multiclickLevel", multiclick.level);
     localStorage.setItem("explosionLevel", explosion.level);
     localStorage.setItem("lootingLevel", looting.level);
+    localStorage.setItem("luckLevel", luck.level);
     localStorage.setItem("autominerLevel", autominer.level);
     localStorage.setItem("rank", rank.level);
+    localStorage.setItem("prestigeLevel", prestige.level);
     localStorage.setItem("currentBlock", currentBlock);
     localStorage.setItem("buyAmount", buyAmount);
     localStorage.setItem("durability", durability);

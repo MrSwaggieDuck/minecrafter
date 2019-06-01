@@ -118,7 +118,14 @@ body { height: 100%; }
 .unavailable{
     background-color: red;
 }
-.vertical{ margin-top: 2%;}
+.prestigeButton{
+    position: absolute;
+    top: 65%;
+    width: 20%;
+    padding-top: 20%;
+    border: black solid 2px;
+    border-radius: 50%;
+}
 /*/ ID's /*/
 #block{
     width:50%;
@@ -320,3 +327,16 @@ body { height: 100%; }
     font-size: 40px;
     padding-top: 10%;
 }
+#prestigeDescription{
+    position: absolute;
+    width: 70%;
+    left: 15%;
+    height: 30%;
+    top: 10%;
+    border: black solid 2px;
+    border-radius: 5px;
+    background-color: #61371F;
+    font-size: 2vw;
+    padding-top: 10%;
+}
+
