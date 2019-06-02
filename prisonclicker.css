@@ -92,7 +92,7 @@ body { height: 100%; }
     padding-top: 2%;
 }
 .upgradeDescription{
-    height: 50%;
+    height: 52%;
     width: 65%;
     font-size: 1.1vw;
     color: lightgray;
@@ -101,6 +101,7 @@ body { height: 100%; }
     position: absolute;
     top: 40%;
     left: 1%;
+    padding-top: 1%;
 }
 .buyAmountButton{
     width: 20%;

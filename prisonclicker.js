@@ -7,6 +7,7 @@ var maxCooldown = 60;
 var durability = 5;
 var buyAmount = 1;
 var now;
+var i;
 var explosions;
 var lastMine = new Date();
 var rank = {
@@ -223,49 +224,76 @@ function update() {
             explosion.cost = 1e6*Math.pow(explosion.increase, explosion.level);
             looting.cost = 1e9*Math.pow(looting.increase, looting.level);
             luck.cost = 1e15*Math.pow(luck.increase, luck.level);
-            i = 0;
-            while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
-                efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
-                i += 1;
+            if (money >= efficiency.cost) {
+                i = 1;
+                while(money > efficiency.cost + 10*Math.pow(efficiency.increase, efficiency.level + i)) {
+                    efficiency.cost += 10*Math.pow(efficiency.increase, efficiency.level + i);
+                    i += 1;
+                }
+                efficiency.max = i;
+            } else {
+                efficiency.max = 0;
             }
-            efficiency.max = i;
-            i = 0;
-            while(money > fortune.cost + 1*Math.pow(fortune.increase, fortune.level + i)) {
-                fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i);
-                i += 1;
+            if (money >= fortune.cost) {
+                i = 0;
+                while(money > fortune.cost + 1*Math.pow(fortune.increase, fortune.level + i)) {
+                    fortune.cost += 1*Math.pow(fortune.increase, fortune.level + i);
+                    i += 1;
+                }
+                fortune.max = i;
+            } else {
+                fortune.max = 0;
             }
-            fortune.max = i;
-            i = 0;
-            while(money > unbreaking.cost + 5*Math.pow(unbreaking.increase, unbreaking.level + i)) {
-                unbreaking.cost += 5*Math.pow(unbreaking.increase, unbreaking.level + i);
-                i += 1;
+            if (money >= unbreaking.cost) {
+                i = 1;
+                while(money > unbreaking.cost + 5*Math.pow(unbreaking.increase, unbreaking.level + i)) {
+                    unbreaking.cost += 5*Math.pow(unbreaking.increase, unbreaking.level + i);
+                    i += 1;
+                }
+                unbreaking.max = i;
+            } else {
+                unbreaking.max = 0;
             }
-            unbreaking.max = i;
-            i = 0;
-            while(money > multiclick.cost + 1000*Math.pow(multiclick.increase, multiclick.level + i)) {
-                multiclick.cost += 1000*Math.pow(multiclick.increase, multiclick.level + i);
-                i += 1;
+            if (money >= multiclick.cost) {
+                i = 1;
+                while(money > multiclick.cost + 1000*Math.pow(multiclick.increase, multiclick.level + i)) {
+                    multiclick.cost += 1000*Math.pow(multiclick.increase, multiclick.level + i);
+                    i += 1;
+                }
+                multiclick.max = i;
+            } else {
+                multiclick.max = 0;
             }
-            multiclick.max = i;
-            i = 0;
-            while(money > explosion.cost + 1e6*Math.pow(explosion.increase, explosion.level + i)) {
-                explosion.cost += 1e6*Math.pow(explosion.increase, explosion.level + i);
-                i += 1;
+            if (money > explosion.cost) {
+                i = 1;
+                while(money > explosion.cost + 1e6*Math.pow(explosion.increase, explosion.level + i)) {
+                    explosion.cost += 1e6*Math.pow(explosion.increase, explosion.level + i);
+                    i += 1;
+                }
+                explosion.max = i;
+            } else {
+                explosion.max = 0;
             }
-            explosion.max = i;
-            i = 0;
-            while(money > looting.cost + 1e9*Math.pow(looting.increase, looting.level + i)) {
-                looting.cost += 1e9*Math.pow(looting.increase, looting.level + i);
-                i += 1;
+            if (money >= looting.cost) {
+                i = 1;
+                while(money > looting.cost + 1e9*Math.pow(looting.increase, looting.level + i)) {
+                    looting.cost += 1e9*Math.pow(looting.increase, looting.level + i);
+                    i += 1;
+                }
+                looting.max = i;
+            } else {
+                looting.max = 0;
             }
-            looting.max = i;
-            i = 0;
-            while(money > luck.cost + 1e15*Math.pow(luck.increase, luck.level + i)) {
-                luck.cost += 1e15*Math.pow(luck.increase, luck.level + i);
-                i += 1;
+            if (money >= luck.cost) {
+                i = 1;
+                while(money > luck.cost + 1e15*Math.pow(luck.increase, luck.level + i)) {
+                    luck.cost += 1e15*Math.pow(luck.increase, luck.level + i);
+                    i += 1;
+                }
+                luck.max = i;
+            } else {
+                luck.max = 0;
             }
-            luck.max = i;
-            i = 0;
         }
         
         if (money >= unbreaking.cost) { document.querySelector("#unbreakingButton").classList.replace("unavailable", "available");
@@ -370,30 +398,30 @@ function update() {
     
     switch (rank.level) {
         case 1: rank = { level: 1, letter: "A", cost: 100, multiplier: 1, }; break;
-        case 2: rank = { level: 2, letter: "B", cost: 100*Math.pow(5 + prestige.level*0.1, 1), multiplier: Math.pow(2, 1), }; break;
-        case 3: rank = { level: 3, letter: "C", cost: 100*Math.pow(5, + prestige.level*0.1), multiplier: Math.pow(2, 2), }; break;
-        case 4: rank = { level: 4, letter: "D", cost: 100*Math.pow(5 + prestige.level*0.1, 3), multiplier: Math.pow(2, 3), }; break;
-        case 5: rank = { level: 5, letter: "E", cost: 100*Math.pow(5 + prestige.level*0.1, 4), multiplier: Math.pow(2, 4), }; break;
-        case 6: rank = { level: 6, letter: "F", cost: 100*Math.pow(5 + prestige.level*0.1, 5), multiplier: Math.pow(2, 5), }; break;
-        case 7: rank = { level: 7, letter: "G", cost: 100*Math.pow(5 + prestige.level*0.1, 6), multiplier: Math.pow(2, 6), }; break;
-        case 8: rank = { level: 8, letter: "H", cost: 100*Math.pow(5 + prestige.level*0.1, 7), multiplier: Math.pow(2, 7), }; break;
-        case 9: rank = { level: 9, letter: "I", cost: 100*Math.pow(5 + prestige.level*0.1, 8), multiplier: Math.pow(2, 8), }; break;
-        case 10: rank = { level: 10, letter: "J", cost: 100*Math.pow(5 + prestige.level*0.1, 9), multiplier: Math.pow(2, 9), }; break;
-        case 11: rank = { level: 11, letter: "K", cost: 100*Math.pow(5 + prestige.level*0.1, 10), multiplier: Math.pow(2, 10), }; break;
-        case 12: rank = { level: 12, letter: "L", cost: 100*Math.pow(5 + prestige.level*0.1, 11), multiplier: Math.pow(2, 11), }; break;
-        case 13: rank = { level: 13, letter: "M", cost: 100*Math.pow(5 + prestige.level*0.1, 12), multiplier: Math.pow(2, 12), }; break;
-        case 14: rank = { level: 14, letter: "N", cost: 100*Math.pow(5 + prestige.level*0.1, 13), multiplier: Math.pow(2, 13), }; break;
-        case 15: rank = { level: 15, letter: "O", cost: 100*Math.pow(5 + prestige.level*0.1, 14), multiplier: Math.pow(2, 14), }; break;
-        case 16: rank = { level: 16, letter: "P", cost: 100*Math.pow(5 + prestige.level*0.1, 15), multiplier: Math.pow(2, 15), }; break;
-        case 17: rank = { level: 17, letter: "Q", cost: 100*Math.pow(5 + prestige.level*0.1, 16), multiplier: Math.pow(2, 16), }; break;
-        case 18: rank = { level: 18, letter: "R", cost: 100*Math.pow(5 + prestige.level*0.1, 17), multiplier: Math.pow(2, 17), }; break;
-        case 19: rank = { level: 19, letter: "S", cost: 100*Math.pow(5 + prestige.level*0.1, 18), multiplier: Math.pow(2, 18), }; break;
-        case 20: rank = { level: 20, letter: "T", cost: 100*Math.pow(5 + prestige.level*0.1, 19), multiplier: Math.pow(2, 19), }; break;
-        case 21: rank = { level: 21, letter: "U", cost: 100*Math.pow(5 + prestige.level*0.1, 20), multiplier: Math.pow(2, 20), }; break;
-        case 22: rank = { level: 22, letter: "V", cost: 100*Math.pow(5 + prestige.level*0.1, 21), multiplier: Math.pow(2, 21), }; break;
-        case 23: rank = { level: 23, letter: "W", cost: 100*Math.pow(5 + prestige.level*0.1, 22), multiplier: Math.pow(2, 22), }; break;
-        case 24: rank = { level: 24, letter: "X", cost: 100*Math.pow(5 + prestige.level*0.1, 23), multiplier: Math.pow(2, 23), }; break;
-        case 25: rank = { level: 25, letter: "Y", cost: 100*Math.pow(5 + prestige.level*0.1, 24), multiplier: Math.pow(2, 24), }; break;
+        case 2: rank = { level: 2, letter: "B", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 1), multiplier: Math.pow(2, 1), }; break;
+        case 3: rank = { level: 3, letter: "C", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 2), multiplier: Math.pow(2, 2), }; break;
+        case 4: rank = { level: 4, letter: "D", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 3), multiplier: Math.pow(2, 3), }; break;
+        case 5: rank = { level: 5, letter: "E", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 4), multiplier: Math.pow(2, 4), }; break;
+        case 6: rank = { level: 6, letter: "F", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 5), multiplier: Math.pow(2, 5), }; break;
+        case 7: rank = { level: 7, letter: "G", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 6), multiplier: Math.pow(2, 6), }; break;
+        case 8: rank = { level: 8, letter: "H", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 7), multiplier: Math.pow(2, 7), }; break;
+        case 9: rank = { level: 9, letter: "I", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 8), multiplier: Math.pow(2, 8), }; break;
+        case 10: rank = { level: 10, letter: "J", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 9), multiplier: Math.pow(2, 9), }; break;
+        case 11: rank = { level: 11, letter: "K", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 10), multiplier: Math.pow(2, 10), }; break;
+        case 12: rank = { level: 12, letter: "L", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 11), multiplier: Math.pow(2, 11), }; break;
+        case 13: rank = { level: 13, letter: "M", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 12), multiplier: Math.pow(2, 12), }; break;
+        case 14: rank = { level: 14, letter: "N", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 13), multiplier: Math.pow(2, 13), }; break;
+        case 15: rank = { level: 15, letter: "O", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 14), multiplier: Math.pow(2, 14), }; break;
+        case 16: rank = { level: 16, letter: "P", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 15), multiplier: Math.pow(2, 15), }; break;
+        case 17: rank = { level: 17, letter: "Q", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 16), multiplier: Math.pow(2, 16), }; break;
+        case 18: rank = { level: 18, letter: "R", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 17), multiplier: Math.pow(2, 17), }; break;
+        case 19: rank = { level: 19, letter: "S", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 18), multiplier: Math.pow(2, 18), }; break;
+        case 20: rank = { level: 20, letter: "T", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 19), multiplier: Math.pow(2, 19), }; break;
+        case 21: rank = { level: 21, letter: "U", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 20), multiplier: Math.pow(2, 20), }; break;
+        case 22: rank = { level: 22, letter: "V", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 21), multiplier: Math.pow(2, 21), }; break;
+        case 23: rank = { level: 23, letter: "W", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 22), multiplier: Math.pow(2, 22), }; break;
+        case 24: rank = { level: 24, letter: "X", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 23), multiplier: Math.pow(2, 23), }; break;
+        case 25: rank = { level: 25, letter: "Y", cost: 100*Math.pow(4 + Math.pow(1.1, prestige.level), 24), multiplier: Math.pow(2, 24), }; break;
         case 26: rank = { level: 26, letter: "Z", cost: "MAX RANK!", multiplier: 2e8, }; break;
     } 
 
@@ -540,7 +568,7 @@ function prestigeF() {
     document.querySelector("#prestige1").classList.replace("available", "unavailable");
     document.querySelector("#prestige2").classList.replace("available", "unavailable");
     document.querySelector("#prestige3").classList.replace("available", "unavailable");
-    money = unbreaking.level = efficiency.level = fortune.level = multiclick.level = explosion.level = looting.level = luck.level = 0;
+    money = unbreaking.level = efficiency.level = fortune.level = multiclick.level = explosion.level = looting.level = luck.level = autominer.level = 0;
     rank.level = 1;
     prestige.level += 1;
     save();
